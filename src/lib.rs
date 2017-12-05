@@ -5,7 +5,7 @@ use std::collections::HashMap;
 lazy_static! {
     static ref HW_FW_KANA_MAP: HashMap<char, char> = {
         let hw_kana: Vec<char> = vec![
-            '｡', '｢', '｣', '､', '･', 'ｰ',
+            ' ', '｡', '｢', '｣', '､', '･', 'ｰ',
             'ｱ', 'ｲ', 'ｳ', 'ｴ', 'ｵ',
             'ｶ', 'ｷ', 'ｸ', 'ｹ', 'ｺ',
             'ｻ', 'ｼ', 'ｽ', 'ｾ', 'ｿ',
@@ -22,7 +22,7 @@ lazy_static! {
             'ｯ'];
 
         let fw_kana: Vec<char> = vec![
-            '。', '「', '」', '、', '・', 'ー',
+            '　', '。', '「', '」', '、', '・', 'ー',
             'ア', 'イ', 'ウ', 'エ', 'オ',
             'カ', 'キ', 'ク', 'ケ', 'コ',
             'サ', 'シ', 'ス', 'セ', 'ソ',
@@ -71,9 +71,9 @@ pub use ConvertMode::*;
 /// assert_eq!(to_double_byte(ascii, AsciiOnly), "ＡＳＣＩＩ");
 /// assert_eq!(to_double_byte(ascii, KanaOnly), "ASCII");
 ///
-/// assert_eq!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
-/// assert_eq!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ ASCII ダブルバイトカナ　ひあらがな　漢字");
-/// assert_eq!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ　ＡＳＣＩＩ　ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ　ASCII　ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ　ＡＳＣＩＩ　ダブルバイトカナ　ひあらがな　漢字");
 /// ```
 pub fn to_double_byte(input: &str, mode: ConvertMode) -> String {
     fn check_voiced(next_char: Option<&char>) -> u32 {
@@ -98,15 +98,21 @@ pub fn to_double_byte(input: &str, mode: ConvertMode) -> String {
     }
 
     fn convert_ascii_char(ch: char) -> char {
-        std::char::from_u32(ch as u32 + 0xFEE0).unwrap_or(ch)
+        std::char::from_u32(
+            if ch == ' ' {
+                // Special ideographic (full-width) space
+                0x3000
+            } else {
+                ch as u32 + 0xFEE0
+            }).unwrap_or(ch)
     }
 
     fn hw_kana_check(byte_val: u32) -> bool {
-        byte_val >= 0xFF61 && byte_val <= 0xFF9D
+        byte_val == 0x0020 || (byte_val >= 0xFF61 && byte_val <= 0xFF9D)
     }
 
     fn ascii_check(byte_val: u32) -> bool {
-        byte_val >= 0x0021 && byte_val <= 0x007E
+        byte_val >= 0x0020 && byte_val <= 0x007E
     }
 
     fn dakuten_check(byte_val: u32) -> bool {
@@ -148,23 +154,23 @@ mod tests {
 
     #[test]
     fn test_conversion_ascii() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰ LATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, AsciiOnly);
-        assert_eq!(out_str, "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
+        assert_eq!(out_str, "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰ　ＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
     }
 
     #[test]
     fn test_conversion_kana() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰ LATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, KanaOnly);
-        assert_eq!(out_str, "ガギグゲゴカキクケコーLATIN01234-!@#$%カタカナひらがな漢字")
+        assert_eq!(out_str, "ガギグゲゴカキクケコー　LATIN01234-!@#$%カタカナひらがな漢字")
     }
 
     #[test]
     fn test_conversion_both() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰ LATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, KanaAndAscii);
-        assert_eq!(out_str, "ガギグゲゴカキクケコーＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
+        assert_eq!(out_str, "ガギグゲゴカキクケコー　ＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
     }
 
     fn _test_conversion_speed() {
