@@ -1,0 +1,10 @@
+[package]
+name = "kana-converter"
+version = "0.1.0"
+authors = ["Michael Micucci <michael.micucci@exchange.co.jp>"]
+
+[dependencies]
+lazy_static = "*"
+
+[dev-dependencies]
+chrono = "*"
