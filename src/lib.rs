@@ -51,28 +51,29 @@ pub enum ConvertMode {
 }
 pub use ConvertMode::*;
 
-/// Convert a string ASCII and half-width katakana characters into a string
-/// of full-width, double-byte characters.  The `mode` parameter governs
-/// whether ASCII, katakana, or both type of characters should be converted.
+/// Convert a string of single-byte ASCII and half-width katakana (半角 - hankaku)
+/// characters into a string of full-width, double-byte (全角 - zenkaku) characters.
+/// The `mode` parameter governs whether ASCII, katakana, or both type of characters
+/// should be converted.
 ///
 /// Example:
 ///
 /// ```rust
-/// use kana_conversion::to_double_byte;
+/// use kana_converter::{to_double_byte, AsciiOnly, KanaOnly, KanaAndAscii};
 ///
 /// let half_kana = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ";
-/// let ascii = "ascii";
-/// let mixed = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ascii ダブルバイトカナ　ひあらがな　漢字";
+/// let ascii = "ASCII";
+/// let mixed = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ASCII ダブルバイトカナ　ひあらがな　漢字";
 ///
-/// assert!(to_double_byte(half_kana, KanaOnly), "シングルバイトカナ");
-/// assert!(to_double_byte(half_kana, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ");
+/// assert_eq!(to_double_byte(half_kana, KanaOnly), "シングルバイトカナ");
+/// assert_eq!(to_double_byte(half_kana, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ");
 ///
-/// assert!(to_double_byte(ascii, AsciiOnly), "ＡＳＣＩＩ");
-/// assert!(to_double_byte(ascii, KanaOnly), "ascii");
-/// 
-/// assert!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
-/// assert!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ ascii ダブルバイトカナ　ひあらがな　漢字");
-/// assert!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(ascii, AsciiOnly), "ＡＳＣＩＩ");
+/// assert_eq!(to_double_byte(ascii, KanaOnly), "ASCII");
+///
+/// assert_eq!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ ASCII ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ ＡＳＣＩＩ ダブルバイトカナ　ひあらがな　漢字");
 /// ```
 pub fn to_double_byte(input: &str, mode: ConvertMode) -> String {
     fn check_voiced(next_char: Option<&char>) -> u32 {
@@ -147,23 +148,23 @@ mod tests {
 
     #[test]
     fn test_conversion_ascii() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺLATIN01234!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, AsciiOnly);
-        assert_eq!(out_str, "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺＬＡＴＩＮ０１２３４！＠＃＄％カタカナひらがな漢字")
+        assert_eq!(out_str, "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
     }
 
     #[test]
     fn test_conversion_kana() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺLATIN01234!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, KanaOnly);
-        assert_eq!(out_str, "ガギグゲゴカキクケコLATIN01234!@#$%カタカナひらがな漢字")
+        assert_eq!(out_str, "ガギグゲゴカキクケコーLATIN01234-!@#$%カタカナひらがな漢字")
     }
 
     #[test]
     fn test_conversion_both() {
-        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺLATIN01234!@#$%カタカナひらがな漢字";
+        let test_str = "ｶﾞｷﾞｸﾞｹﾞｺﾞｶｷｸｹｺｰLATIN01234-!@#$%カタカナひらがな漢字";
         let out_str = to_double_byte(test_str, KanaAndAscii);
-        assert_eq!(out_str, "ガギグゲゴカキクケコＬＡＴＩＮ０１２３４！＠＃＄％カタカナひらがな漢字")
+        assert_eq!(out_str, "ガギグゲゴカキクケコーＬＡＴＩＮ０１２３４－！＠＃＄％カタカナひらがな漢字")
     }
 
     fn _test_conversion_speed() {
