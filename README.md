@@ -30,6 +30,9 @@ extern crate kana_conversion;
 
 # Conversion Functions
 
-The "to_double_byte" function takes a character to convert and a
-mode.  If AsciiOnly is selected, only normal ASCII chars will be
-converted to
+The "to_double_byte" function takes a string slice to convert and a mode.  If AsciiOnly is 
+selected, only normal ASCII chars will be converted to double-byte, while if KanaOnly 
+is selected, only half-width katakana will convert, while KanaAndAscii will convert both.
+
+The return is an owned String which holds double-byte characters, converted as specified by the 
+`mode`.
