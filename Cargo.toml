@@ -6,13 +6,13 @@ authors = ["Michael Micucci <micucci@fox-den.org>"]
 repository = "http://github.com/kitsuneninetails/kana-converter"
 license = "MIT"
 readme = "README.md"
-keywords = ["katakana", "hiragana", "kana", "byte-conversion", "full-width", "hald-width", "hankaku", "zenkaku"]
+keywords = ["kana", "byte-conversion", "full-width", "half-width"]
 
 [badges]
 travis-ci = { repository = "kitsuneninetails/kana-converter" }
 
 [dependencies]
-lazy_static = "*"
+lazy_static = "1"
 
 [dev-dependencies]
-chrono = "*"
+chrono = "0.4"
