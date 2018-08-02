@@ -36,3 +36,14 @@ is selected, only half-width katakana will convert, while KanaAndAscii will conv
 
 The return is an owned String which holds double-byte characters, converted as specified by the 
 `mode`.
+
+# License
+
+Licensed under:
+
+ * MIT license
+   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+# Contribution
+
+Contributions are welcome, and will be subject to the regulations presented in the license indicated above.

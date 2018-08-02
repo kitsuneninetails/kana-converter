@@ -63,7 +63,7 @@ pub use ConvertMode::*;
 ///
 /// let half_kana = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ";
 /// let ascii = "ASCII";
-/// let mixed = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ASCII ダブルバイトカナ　ひあらがな　漢字";
+/// let mixed = "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ ASCII ダブルバイトカナ　ひらがな　漢字";
 ///
 /// assert_eq!(to_double_byte(half_kana, KanaOnly), "シングルバイトカナ");
 /// assert_eq!(to_double_byte(half_kana, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ");
@@ -71,9 +71,9 @@ pub use ConvertMode::*;
 /// assert_eq!(to_double_byte(ascii, AsciiOnly), "ＡＳＣＩＩ");
 /// assert_eq!(to_double_byte(ascii, KanaOnly), "ASCII");
 ///
-/// assert_eq!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ　ＡＳＣＩＩ　ダブルバイトカナ　ひあらがな　漢字");
-/// assert_eq!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ　ASCII　ダブルバイトカナ　ひあらがな　漢字");
-/// assert_eq!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ　ＡＳＣＩＩ　ダブルバイトカナ　ひあらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, AsciiOnly), "ｼﾝｸﾞﾙﾊﾞｲﾄｶﾅ　ＡＳＣＩＩ　ダブルバイトカナ　ひらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaOnly), "シングルバイトカナ　ASCII　ダブルバイトカナ　ひらがな　漢字");
+/// assert_eq!(to_double_byte(mixed, KanaAndAscii), "シングルバイトカナ　ＡＳＣＩＩ　ダブルバイトカナ　ひらがな　漢字");
 /// ```
 pub fn to_double_byte(input: &str, mode: ConvertMode) -> String {
     fn check_voiced(next_char: Option<&char>) -> u32 {
